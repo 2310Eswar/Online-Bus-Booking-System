@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    /* Styling Architecture System Variables Map */
+:root {
+--primary-gradient: linear-gradient(135deg, #7F00FF 0%, #E100FF 100%);
+--wave-bg: #9b51e0;
+--text-dark: #1e293b;
+--text-muted: #64748b;
+--accent-yellow: #f1c40f;
+--accent-blue: #00f2fe;
+--bg-light: #f8f9fa;
+--surface: #ffffff;
+--border-color: #e2e8f0;
+--success-green: #2ecc71;
+}
+
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+background-color: var(--bg-light);
+color: var(--text-dark);
+min-height: 100vh;
+}
+
+/* Structural Components & Headers */
+.navbar {
+background: var(--surface);
+padding: 1rem 5%;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 1px solid var(--border-color);
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.logo {
+font-size: 1.5rem;
+font-weight: 800;
+color: #7F00FF;
+}
+.logo span { color: #e02424; }
+
+.auth-controls { display: flex; gap: 1rem; }
+.user-tag-context { font-weight: 600; color: #7F00FF; display: flex; align-items: center; gap: 1rem; }
+
+/* Buttons Components UI Library */
+button { cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease; }
+.btn-primary { background: var(--primary-gradient); color: white; padding: 0.6rem 1.2rem; }
+.btn-secondary { background: transparent; border: 1px solid var(--border-color); color: var(--text-dark); padding: 0.6rem 1.2rem; }
+.btn-back { background: transparent; color: #7F00FF; margin-bottom: 1.5rem; display: inline-block; font-size: 0.95rem; }
+button:hover { opacity: 0.95; transform: translateY(-1px); }
+
+/* Unified App Dynamic Views Setup Matrix */
+.app-screen { display: none; }
+.app-screen.active { display: block; }
+.content-container { width: 90%; max-width: 1200px; margin: 2rem auto; }
+.layout-centered { display: flex; flex-direction: column; align-items: center; }
+
+/* Hero Banner Layout Configuration (Screenshot 1) */
+.hero-section {
+background: var(--primary-gradient);
+color: white;
+text-align: center;
+padding: 4rem 1rem 8rem 1rem;
+position: relative;
+overflow: hidden;
+background-size: 200% 200%;
+animation: gradientShift 12s ease infinite;
+}
+.hero-section::before {
+content: '';
+position: absolute;
+inset: 0;
+background: radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 35%);
+pointer-events: none;
+}
+.hero-section::after {
+content: '';
+position: absolute;
+inset: 0;
+background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 60%);
+pointer-events: none;
+}
+
+.hero-badge {
+background: rgba(255, 255, 255, 0.2);
+display: inline-block;
+padding: 0.4rem 1rem;
+border-radius: 20px;
+font-size: 0.85rem;
+margin-bottom: 1.5rem;
+opacity: 0;
+animation: fadeSlideIn 0.85s ease-out 0.2s both;
+}
+
+.hero-section h1 {
+font-size: 3rem;
+font-weight: 800;
+line-height: 1.2;
+margin-bottom: 1rem;
+opacity: 0;
+animation: fadeSlideIn 0.85s ease-out 0.35s both;
+}
+
+.txt-yellow { color: var(--accent-yellow); }
+.txt-blue { color: var(--accent-blue); }
+
+.hero-subtitle {
+max-width: 600px;
+margin: 0 auto 2rem auto;
+opacity: 0;
+line-height: 1.6;
+animation: fadeSlideIn 0.85s ease-out 0.5s both;
+}
+
+.hero-stats {
+display: flex;
+justify-content: center;
+gap: 1.5rem;
+margin-bottom: 2.5rem;
+opacity: 0;
+animation: fadeSlideIn 0.85s ease-out 0.65s both;
+}
+.hero-stats span {
+background: rgba(255, 255, 255, 0.15);
+padding: 0.5rem 1.2rem;
+border-radius: 8px;
+font-weight: 600;
+}
+
+.search-bar-wrapper {
+background: var(--surface);
+max-width: 650px;
+margin: 0 auto;
+border-radius: 12px;
+padding: 0.75rem 1.2rem;
+display: flex;
+align-items: center;
+box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+opacity: 0;
+animation: popIn 0.85s ease-out 0.9s both;
+}
+.search-bar-wrapper input { flex: 1; border: none; outline: none; font-size: 1rem; padding: 0.5rem; color: var(--text-dark); }
+.search-icon, .filter-icon { color: var(--text-muted); font-size: 1.2rem; }
+
+.wave-shape { position: absolute; bottom: 0; left: 0; width: 100%; transform: scaleY(1.5); transform-origin: bottom; }
+
+/* Fleet Bus Manifest Display Grid (Screenshot 2) */
+.section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+.results-count { color: var(--text-muted); margin-bottom: 2rem; }
+.bus-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
+
+.bus-card {
+background: var(--surface);
+border-radius: 12px;
+padding: 1.5rem;
+border: 1px solid var(--border-color);
+box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+opacity: 0;
+transform: translateY(28px);
+animation: cardReveal 0.8s ease-out both;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.bus-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+.bus-grid .bus-card:nth-child(1) { animation-delay: 0.12s; }
+.bus-grid .bus-card:nth-child(2) { animation-delay: 0.2s; }
+.bus-grid .bus-card:nth-child(3) { animation-delay: 0.28s; }
+.bus-grid .bus-card:nth-child(4) { animation-delay: 0.36s; }
+.bus-grid .bus-card:nth-child(5) { animation-delay: 0.44s; }
+.bus-grid .bus-card:nth-child(6) { animation-delay: 0.52s; }
+.bus-grid .bus-card:nth-child(7) { animation-delay: 0.6s; }
+.bus-grid .bus-card:nth-child(8) { animation-delay: 0.68s; }
+.bus-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.bus-title { font-size: 1.2rem; font-weight: 700; color: var(--text-dark); }
+.bus-tag { background: #f3e8ff; color: #7F00FF; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 4px; display: inline-block; margin-top: 0.25rem; font-weight: 600; }
+.rating-badge { background: #fef3c7; color: #d97706; padding: 0.2rem 0.5rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; }
+
+.route-timeline { display: flex; justify-content: space-between; align-items: center; margin: 1.5rem 0; font-size: 0.9rem; }
+.time-node strong { font-size: 1.1rem; display: block; color: var(--text-dark); }
+.time-node p { color: var(--text-muted); font-size: 0.8rem; }
+.timeline-arrow { color: #7F00FF; font-weight: bold; font-size: 1.2rem; }
+
+.amenities-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.amenity-tag { background: #f1f5f9; color: var(--text-muted); font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; }
+
+.bus-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 1rem; }
+.price-tag { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); }
+.price-tag span { font-size: 0.8rem; color: var(--text-muted); font-weight: 400; }
+
+/* Grid Splitting Architecture Layouts */
+.booking-layout-wrapper { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start; }
+@media(max-width: 900px) { .booking-layout-wrapper { grid-template-columns: 1fr; } }
+
+/* Seating Diagram Engine Rules (Screenshot 3) */
+.bus-cabin-card { background: var(--surface); border-radius: 12px; border: 1px solid var(--border-color); padding: 2rem; text-align: center; }
+.legend-bar { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem; font-size: 0.9rem; }
+.legend-box { width: 18px; height: 18px; display: inline-block; vertical-align: middle; border-radius: 4px; margin-right: 0.25rem; }
+.legend-box.available { background: #f1f5f9; border: 1px solid var(--border-color); }
+.legend-box.selected { background: #a855f7; }
+.legend-box.booked { background: #cbd5e1; }
+
+.cabin-front { background: #e2e8f0; padding: 0.4rem; border-radius: 6px; max-width: 200px; margin: 0 auto 2rem auto; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
+
+.seat-grid { display: grid; grid-template-columns: repeat(4, 50px); gap: 1rem 0.5rem; justify-content: center; margin: 0 auto; max-width: 280px; }
+.seat-grid div:nth-child(4n-2) { margin-right: 2.5rem; } /* Creates the interior walking aisle */
+
+.seat { width: 50px; height: 45px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease; user-select: none; }
+.seat.vacant:hover { border-color: #a855f7; color: #a855f7; background: #faf5ff; transform: translateY(-2px); }
+.seat.chosen { background: #a855f7 !important; color: white !important; border-color: #a855f7; animation: seatPop 0.25s ease both; }
+.seat.occupied { background: #cbd5e1; color: #94a3b8; border-color: #cbd5e1; cursor: not-allowed; }
+
+/* Receipt Metadata Panel Modules */
+.summary-card { background: var(--surface); border-radius: 12px; border: 1px solid var(--border-color); padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+.summary-card h3 { margin-bottom: 1.25rem; font-size: 1.2rem; }
+.summary-row { display: flex; justify-content: space-between; margin: 0.8rem 0; font-size: 0.95rem; }
+.summary-row span { color: var(--text-muted); }
+.summary-card hr { border: none; border-top: 1px solid var(--border-color); margin: 1rem 0; }
+.summary-total { display: flex; justify-content: space-between; font-size: 1.4rem; font-weight: 800; margin-top: 1rem; }
+.btn-checkout { width: 100%; background: var(--primary-gradient); color: white; padding: 1rem; font-size: 1.05rem; margin-top: 1.5rem; box-shadow: 0 4px 12px rgba(127, 0, 255, 0.2); }
+.container-disabled { background: #e2e8f0 !important; color: #94a3b8 !important; box-shadow: none !important; cursor: not-allowed; }
+
+/* Passenger Form Block Modules (Screenshot 4) */
+.form-card { background: var(--surface); border-radius: 12px; border: 1px solid var(--border-color); padding: 2rem; }
+.form-card h3 { font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+.input-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.25rem; }
+.input-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+.input-group input, .input-group select { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; outline: none; transition: border 0.2s; }
+.input-group input:focus, .input-group select:focus { border-color: #7F00FF; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.payment-methods { display: flex; gap: 1rem; margin-top: 0.5rem; }
+.pay-option { flex: 1; border: 1px solid var(--border-color); padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+.pay-option.active { border-color: #7F00FF; background: #faf5ff; }
+
+/* Booking Success Ticket Engine Outputs (Screenshot 5 & 6) */
+.success-banner { background: var(--success-green); color: white; text-align: center; padding: 3rem 1rem; animation: bannerGlow 1.5s ease both; }
+.confetti-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+.badge-paid { background: rgba(255, 255, 255, 0.2); display: inline-block; padding: 0.5rem 1.5rem; border-radius: 30px; font-weight: 700; margin-top: 1rem; }
+
+.ticket-card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border-color); width: 100%; max-width: 500px; margin-top: -2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; animation: slideInUp 0.6s ease both; }
+.ticket-header { background: #7F00FF; color: white; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem; }
+.ticket-class-badge { background: rgba(255, 255, 255, 0.2); font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 4px; }
+.ticket-body { padding: 1.5rem; }
+.ticket-route-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed var(--border-color); }
+.ticket-line { color: var(--text-muted); font-size: 1.2rem; position: relative; width: 40%; text-align: center; }
+.ticket-line::after { content: ''; position: absolute; width: 100%; height: 1px; background: #cbd5e1; top: 50%; left: 0; z-index: -1; }
+.ticket-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem; }
+.ticket-details-grid label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.2rem; }
+.ticket-details-grid p { font-weight: 700; color: var(--text-dark); }
+.ticket-footer { background: #f8f9fa; margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+.ticket-id { font-family: monospace; font-size: 1rem; font-weight: bold; color: var(--text-muted); }
+.success-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+
+/* Interactive Modals Overlays */
+.modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.25s ease; }
+.modal-overlay.open { display: flex; opacity: 1; }
+.modal-card { background: var(--surface); width: 90%; max-width: 450px; border-radius: 12px; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); animation: modalPop 0.35s ease both; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.close-modal { background: transparent; font-size: 1.5rem; color: var(--text-muted); }
+.btn-auth-submit { width: 100%; background: var(--primary-gradient); color: white; padding: 0.8rem; font-size: 1rem; margin-top: 0.5rem; }
+.badge-list { font-size: 0.85rem; color: #7F00FF !important; font-weight: 600; }
+
+@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { from { opacity: 0; transform: scale(0.98) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes cardReveal { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes modalPop { from { opacity: 0; transform: translateY(20px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes slideInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bannerGlow { 0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); } 50% { box-shadow: 0 20px 70px rgba(255,255,255,0.18); } }
+@keyframes seatPop { 0% { transform: scale(0.98); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
+    .history-card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+.history-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+.history-route { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.history-meta { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 0.25rem; }
+.history-amount { font-size: 1.4rem; font-weight: 800; color: #7F00FF; text-align: right; }
+.history-seats { background: #f3e8ff; color: #7F00FF; font-size: 0.8rem; padding: 0.3rem 0.7rem; border-radius: 20px; font-weight: 600; margin-top: 0.5rem; display: inline-block; }
+.history-empty { text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
+.history-empty p { font-size: 1.1rem; margin-top: 0.5rem; }
+</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelSmarter - Book Faster</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="logo">Travel<span>Smarter</span></div>
+    <div class="auth-controls" id="authControls">
+        <button class="btn-secondary" onclick="openModal('loginModal')">Login</button>
+        <button class="btn-primary" onclick="openModal('registerModal')">Register</button>
+    </div>
+</header>
+
+<main id="appContainer">
+
+    <section id="homeScreen" class="app-screen active">
+        <div class="hero-section">
+            <div class="hero-badge">✨ Book your journey today</div>
+            <h1>Travel <span class="txt-yellow">Smarter</span>, <br>Book <span class="txt-blue">Faster</span></h1>
+            <p class="hero-subtitle">Choose from hundreds of bus routes across the country. Comfortable seats, affordable prices, and hassle-free booking.</p>
+            <div class="hero-stats">
+                <span>🚌 500+ Buses</span>
+                <span>📍 100+ Routes</span>
+            </div>
+            <div class="search-bar-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="busSearchInput" placeholder="Search by city or bus name..." oninput="filterBuses()">
+                <span class="filter-icon">⚙️</span>
+            </div>
+            <div class="wave-shape">
+                <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                    <path d="M0,32L120,42.7C240,53,480,75,720,74.7C960,75,1200,53,1320,42.7L1440,32L1440,120L1320,120C1200,120,960,120,720,120C480,120,240,120,120,120L0,120Z" fill="#f8f9fa"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div class="content-container">
+            <h2 class="section-title">Available Buses</h2>
+            <p class="results-count"><span id="busCount">3</span> buses found</p>
+            <div class="bus-grid" id="busGrid">
+            </div>
+        </div>
+    </section>
+
+    <section id="seatScreen" class="app-screen content-container">
+        <button class="btn-back" onclick="navigateTo('homeScreen')">⬅️ Back to availability</button>
+        <h2 class="section-title">Select Your Seats</h2>
+
+        <div class="booking-layout-wrapper">
+            <div class="bus-cabin-card">
+                <div class="legend-bar">
+                    <span><span class="legend-box available"></span> Available</span>
+                    <span><span class="legend-box selected"></span> Selected</span>
+                    <span><span class="legend-box booked"></span> Booked</span>
+                </div>
+                <div class="cabin-front">🚌 FRONT</div>
+                <div class="seat-grid" id="seatLayoutContainer">
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <h3>Booking Summary</h3>
+                <div class="summary-row"><span>Bus</span><strong id="summaryBusName">-</strong></div>
+                <div class="summary-row"><span>Route</span><strong id="summaryRoute">-</strong></div>
+                <div class="summary-row"><span>Price per seat</span><strong id="summaryPrice">₹0.00</strong></div>
+                <hr>
+                <div class="summary-row"><span>Selected Seats (<span id="selectedCount">0</span>)</span><span id="selectedSeatsList" class="badge-list">Click seats to select them</span></div>
+                <hr>
+                <div class="summary-total"><span>Total</span><span id="summaryTotal">₹0</span></div>
+                <button id="btnProceedToPay" class="btn-checkout container-disabled" disabled onclick="handleProceedToCheckout()">Continue ➡️</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="checkoutScreen" class="app-screen content-container">
+        <button class="btn-back" onclick="navigateTo('seatScreen')">⬅️ Back to seat selection</button>
+        <h2 class="section-title">Confirm Your Booking</h2>
+
+        <div class="booking-layout-wrapper">
+            <div class="form-card">
+                <h3>👤 Passenger Details</h3>
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="passFullName" placeholder="Enter your full name" required>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="passEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="passPhone" placeholder="Enter your phone number" required>
+                </div>
+
+                <h3 style="margin-top:2rem;">💳 Payment Method</h3>
+                <div class="payment-methods">
+                    <label class="pay-option active"><input type="radio" name="pay" checked> 💳 Credit Card</label>
+                    <label class="pay-option"><input type="radio" name="pay"> 🏦 Net Banking</label>
+                    <label class="pay-option"><input type="radio" name="pay"> 📱 UPI</label>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <h3>Trip Summary</h3>
+                <p id="checkoutBusName" style="font-weight:600; margin-bottom:0.25rem;">-</p>
+                <p id="checkoutRoute" style="color:#666; font-size:0.9rem; margin-bottom:0.25rem;">-</p>
+                <p id="checkoutTime" style="color:#666; font-size:0.9rem; margin-bottom:1rem;">-</p>
+                <hr>
+                <div class="summary-row"><span>Seats (<span id="chkSeatCount">0</span>)</span><strong id="chkSeatsList">-</strong></div>
+                <div class="summary-row"><span>Base Fare</span><span id="chkBasePrice">₹0.00</span></div>
+                <div class="summary-row"><span>Tax (5%)</span><span id="chkTaxPrice">₹0.00</span></div>
+                <hr>
+                <div class="summary-total"><span>Total</span><span id="chkTotalPrice">₹0.00</span></div>
+                <button class="btn-checkout" onclick="executeFinalPaymentTicketGeneration()">Confirm & Pay <span id="chkPayBtnTotal">₹0.00</span></button>
+            </div>
+        </div>
+    </section>
+
+    <section id="successScreen" class="app-screen">
+        <div class="success-banner">
+            <div class="confetti-icon">🎉</div>
+            <h2>Booking Confirmed!</h2>
+            <p>Your 1 seat has been booked successfully</p>
+            <div class="badge-paid">Total Paid: <span id="successTotalPaid">₹0.00</span></div>
+        </div>
+
+        <div class="content-container layout-centered">
+            <div class="ticket-card">
+                <div class="ticket-header">
+                    <span id="ticketBusName">-</span>
+                    <span class="ticket-class-badge">AC Sleeper</span>
+                </div>
+                <div class="ticket-body">
+                    <div class="ticket-route-row">
+                        <div><strong>06:00 AM</strong><p id="ticketFromCity">-</p></div>
+                        <div class="ticket-line">🚌</div>
+                        <div style="text-align: right;"><strong>10:30 AM</strong><p id="ticketToCity">-</p></div>
+                    </div>
+                    <div class="ticket-details-grid">
+                        <div><label>PASSENGER</label><p id="ticketPassengerName">-</p></div>
+                        <div><label>SEAT</label><p id="ticketSeatNumber">-</p></div>
+                        <div><label>DATE</label><p id="ticketDate">-</p></div>
+                        <div><label>DURATION</label><p>4h 30m</p></div>
+                    </div>
+                    <div class="ticket-footer">
+                        <span class="ticket-id" id="ticketReferenceCode">#BKM-XXXXXX</span>
+                        <span class="ticket-price">Amount Paid: <strong id="ticketAmountPaid">₹0.00</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success-actions">
+                <button class="btn-secondary" onclick="window.print()">Print Tickets</button>
+                <button class="btn-primary" onclick="resetAppEngineToHome()">Book Another Trip</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="historyScreen" class="app-screen content-container">
+        <button class="btn-back" onclick="navigateTo('homeScreen')">⬅️ Back to Home</button>
+        <h2 class="section-title">📋 My History of Bookings</h2>
+        <p class="results-count" id="historyCount"></p>
+        <div id="historyList"></div>
+    </section>
+
+</main>
+
+<div class="modal-overlay" id="registerModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Create Account</h3>
+            <button class="close-modal" onclick="closeModal('registerModal')">&times;</button>
+        </div>
+        <form id="registerForm" onsubmit="handleRegistrationSubmit(event)">
+            <div class="form-row">
+                <div class="input-group"><label>First Name</label><input type="text" id="regFirstName" required placeholder="John"></div>
+                <div class="input-group"><label>Last Name</label><input type="text" id="regLastName" required placeholder="Doe"></div>
+            </div>
+            <div class="input-group"><label>Email Address</label><input type="email" id="regEmail" required placeholder="john.doe@example.com"></div>
+            <div class="input-group"><label>Date of Birth</label><input type="date" id="regDOB" required></div>
+            <div class="input-group">
+                <label>Mobile Number</label>
+                <input type="tel" id="regMobile" required placeholder="9876543210">
+            </div>
+            <div class="input-group"><label>Password</label><input type="password" id="regPassword" required placeholder="••••••••"></div>
+            <div class="input-group">
+                <label>Gender</label>
+                <select id="regGender" required>
+                    <option value="" disabled selected>Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-auth-submit">Register</button>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Account Login</h3>
+            <button class="close-modal" onclick="closeModal('loginModal')">&times;</button>
+        </div>
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+            <div class="input-group"><label>Email Address</label><input type="email" id="loginEmail" required placeholder="Enter registered email"></div>
+            <div class="input-group"><label>Password</label><input type="password" id="loginPassword" required placeholder="Enter password"></div>
+            <button type="submit" class="btn-auth-submit">Log In</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Global Application State Store Matrix
+const appState = {
+users: new Map(), // Email String Key -> Profile data object storage mapping
+activeUser: null,
+fleet: [
+    { id: "bus-101", name: "Royal Express", class: "AC Sleeper", route: "Chennai to Bangalore", from: "Chennai", to: "Bangalore", time: "06:00 AM - 10:30 AM", rating: "4.5", fare: 1200.00, bookedSeats: ["1C", "2C", "3D", "4C", "5C", "6B", "7D", "9A"] },
+    { id: "bus-102", name: "Blue Line Travels", class: "AC Semi-Sleeper", route: "Chennai to Mumbai", from: "Chennai", to: "Mumbai", time: "08:00 AM - 01:30 PM", rating: "4.2", fare: 2000.00, bookedSeats: ["1A", "1B", "2D", "5A", "8C"] },
+    { id: "bus-103", name: "Pink City Express", class: "AC Sleeper", route: "Chennai to Tirupathur", from: "Chennai", to: "Tirupathur", time: "09:00 AM - 01:00 PM", rating: "4.7", fare: 800.00, bookedSeats: ["2A", "4B", "8D"] }
+],
+selectedBus: null,
+selectedSeats: []
+};
+
+// Application Bootstrapping Initializer Hook
+document.addEventListener("DOMContentLoaded", () => {
+renderBusCards(appState.fleet);
+setupPaymentInteractions();
+});
+
+// View Navigation Router Utility Engine
+function navigateTo(screenId) {
+document.querySelectorAll(".app-screen").forEach(screen => screen.classList.remove("active"));
+document.getElementById(screenId).classList.add("active");
+window.scrollTo(0, 0);
+}
+
+// Authentication Modal Controllers
+function openModal(modalId) { document.getElementById(modalId).classList.add("open"); }
+function closeModal(modalId) { document.getElementById(modalId).classList.remove("open"); }
+
+// Handle Account Registration Processing
+async function handleRegistrationSubmit(event) {
+    event.preventDefault();
+
+    const payload = {
+        firstName:   document.getElementById("regFirstName").value.trim(),
+        lastName:    document.getElementById("regLastName").value.trim(),
+        email:       document.getElementById("regEmail").value.trim().toLowerCase(),
+        mobileNumber: document.getElementById("regMobile").value.trim(),
+        gender:      document.getElementById("regGender").value,
+        dateOfBirth: document.getElementById("regDOB").value,
+        password:    document.getElementById("regPassword").value
+    };
+
+    try {
+        const res = await fetch("http://localhost:8081/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+
+        if (res.status === 208) { // ALREADY_REPORTED
+            alert("This email is already registered. Please log in.");
+            return;
+        }
+        if (!res.ok) {
+            alert("Registration failed: " + text);
+            return;
+        }
+
+        alert("🎉 Registration complete! You can now log in.");
+        document.getElementById("registerForm").reset();
+        closeModal("registerModal");
+        openModal("loginModal");
+
+    } catch (err) {
+        alert("Network error: Is your Spring Boot app running?\n" + err.message);
+    }
+}
+
+// Handle Login Session Authentication
+async function handleLoginSubmit(event) {
+    event.preventDefault();
+
+    const email    = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    try {
+        const res = await fetch("http://localhost:8081/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (res.status === 404) { alert("No account found with that email."); return; }
+        if (res.status === 401) { alert("Incorrect password. Try again."); return; }
+        if (!res.ok)            { alert("Login error: " + await res.text()); return; }
+
+        const data = await res.json(); // { message, email, token }
+
+        // Store session in appState
+        appState.activeUser = {
+            firstName: data.firstName, // fallback display name
+            email: data.email,
+            token: data.token
+        };
+
+        // Optionally fetch full profile here if you have a /auth/me endpoint
+        updateAuthenticationNavbarUI();
+        document.getElementById("loginForm").reset();
+        closeModal("loginModal");
+
+    } catch (err) {
+        alert("Network error: Is your Spring Boot app running?\n" + err.message);
+    }
+}
+// Synchronize Session Header States UI Component
+function updateAuthenticationNavbarUI() {
+    const container = document.getElementById("authControls");
+    if (appState.activeUser) {
+        container.innerHTML = `
+            <div class="user-tag-context">
+                <span>👋 Welcome, <strong>${appState.activeUser.firstName}</strong></span>
+                <button class="btn-secondary" onclick="openHistoryScreen()">📋 My Bookings</button>
+                <button class="btn-secondary" onclick="handleLogoutContext()">Logout</button>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <button class="btn-secondary" onclick="openModal('loginModal')">Login</button>
+            <button class="btn-primary" onclick="openModal('registerModal')">Register</button>
+        `;
+    }
+}
+function handleLogoutContext() {
+appState.activeUser = null;
+updateAuthenticationNavbarUI();
+resetAppEngineToHome();
+}
+
+// Render Available Fleet Search Matching Cards Layout Engine
+function renderBusCards(busesList) {
+const targetGrid = document.getElementById("busGrid");
+document.getElementById("busCount").innerText = busesList.length;
+targetGrid.innerHTML = "";
+
+if (busesList.length === 0) {
+    targetGrid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; padding: 3rem; color: var(--text-muted);">No active buses found matching filter strings.</p>`;
+    return;
+}
+
+busesList.forEach(bus => {
+    const card = document.createElement("div");
+    card.className = "bus-card";
+    card.innerHTML = `
+        <div>
+            <div class="bus-card-header">
+                <div>
+                    <h3 class="bus-title">${bus.name}</h3>
+                    <span class="bus-tag">${bus.class}</span>
+                </div>
+                <span class="rating-badge">★ ${bus.rating}</span>
+            </div>
+            <div class="route-timeline">
+                <div class="time-node"><strong>${bus.time.split(" - ")[0]}</strong><p>${bus.from}</p></div>
+                <div class="timeline-arrow">➔</div>
+                <div class="time-node" style="text-align:right;"><strong>${bus.time.split(" - ")[1]}</strong><p>${bus.to}</p></div>
+            </div>
+            <div class="amenities-row">
+                <span class="amenity-tag">📶 WiFi</span>
+                <span class="amenity-tag">❄️ AC</span>
+                <span class="amenity-tag">🔌 Charging Port</span>
+                <span class="amenity-tag">🧣 Blanket</span>
+            </div>
+        </div>
+        <div class="bus-card-footer">
+            <div class="price-tag">₹${bus.fare}<span>/seat</span></div>
+            <button class="btn-primary" onclick="initializeSeatReservation('${bus.id}')">Book Now</button>
+        </div>
+    `;
+    targetGrid.appendChild(card);
+});
+}
+
+// Process Realtime Filtering Across Fleet Objects
+function filterBuses() {
+const rawQuery = document.getElementById("busSearchInput").value.toLowerCase().trim();
+const matchingOutput = appState.fleet.filter(b => b.name.toLowerCase().includes(rawQuery) || b.route.toLowerCase().includes(rawQuery));
+renderBusCards(matchingOutput);
+}
+
+// Seat Diagram Blueprint Renderer Grid Map (Screenshot 3 Matching Layout)
+function initializeSeatReservation(busId) {
+const targetedBus = appState.fleet.find(b => b.id === busId);
+appState.selectedBus = targetedBus;
+appState.selectedSeats = [];
+
+// Reset Summary Output Indicators
+document.getElementById("summaryBusName").innerText = targetedBus.name;
+document.getElementById("summaryRoute").innerText = targetedBus.route;
+document.getElementById("summaryPrice").innerText = `₹${targetedBus.fare.toFixed(2)}`;
+updateSeatSummarySummaryCardValues();
+
+// Loop Structure Render Matrix
+const container = document.getElementById("seatLayoutContainer");
+container.innerHTML = "";
+
+const rowsCount = 9;
+const columnsArray = ["A", "B", "C", "D"];
+
+for (let r = 1; r <= rowsCount; r++) {
+    columnsArray.forEach(col => {
+        const coordinateId = `${r}${col}`;
+        const isBooked = targetedBus.bookedSeats.includes(coordinateId);
+
+        const seatButton = document.createElement("div");
+        seatButton.innerText = coordinateId;
+
+        if (isBooked) {
+            seatButton.className = "seat occupied";
+        } else {
+            seatButton.className = "seat vacant";
+            seatButton.onclick = () => handleSeatGridInteractionClick(seatButton, coordinateId);
+        }
+        container.appendChild(seatButton);
+    });
+}
+navigateTo("seatScreen");
+}
+
+// Track/Toggle Click Vectors inside Grid Array Mapping
+function handleSeatGridInteractionClick(element, coordinateId) {
+if (appState.selectedSeats.includes(coordinateId)) {
+    appState.selectedSeats = appState.selectedSeats.filter(s => s !== coordinateId);
+    element.classList.remove("chosen");
+} else {
+    appState.selectedSeats.push(coordinateId);
+    element.classList.add("chosen");
+}
+updateSeatSummarySummaryCardValues();
+}
+
+// Refresh calculation summaries internally inside selection screen variables
+function updateSeatSummarySummaryCardValues() {
+const count = appState.selectedSeats.length;
+const total = count * (appState.selectedBus ? appState.selectedBus.fare : 0);
+
+document.getElementById("selectedCount").innerText = count;
+document.getElementById("selectedSeatsList").innerText = count > 0 ? appState.selectedSeats.join(", ") : "Click seats to select them";
+document.getElementById("summaryTotal").innerText = `₹${total}`;
+
+const proceedBtn = document.getElementById("btnProceedToPay");
+if (count > 0) {
+    proceedBtn.classList.remove("container-disabled");
+    proceedBtn.disabled = false;
+} else {
+    proceedBtn.classList.add("container-disabled");
+    proceedBtn.disabled = true;
+}
+}
+
+// Route Validation Checks to Proceed to Checkout Form Screen Context
+function handleProceedToCheckout() {
+if (!appState.activeUser) {
+    alert("Access Denied: Account Authentication session context token missing. Please register or login before attempting checkout operations.");
+    openModal("loginModal");
+    return;
+}
+
+const bus = appState.selectedBus;
+const count = appState.selectedSeats.length;
+const baseFare = count * bus.fare;
+const taxCalculation = baseFare * 0.05; // 5% flat metric calculation
+const overallTotal = baseFare + taxCalculation;
+
+// Prefill user reference variables on form inputs mapping
+document.getElementById("passFullName").value = `${appState.activeUser.firstName} ${appState.activeUser.lastName}`;
+document.getElementById("passEmail").value = appState.activeUser.email;
+
+// Set dynamic transaction layout contexts properties text values
+document.getElementById("checkoutBusName").innerText = bus.name;
+document.getElementById("checkoutRoute").innerText = bus.route;
+document.getElementById("checkoutTime").innerText = bus.time;
+document.getElementById("chkSeatCount").innerText = count;
+document.getElementById("chkSeatsList").innerText = appState.selectedSeats.join(", ");
+document.getElementById("chkBasePrice").innerText = `₹${baseFare.toFixed(2)}`;
+document.getElementById("chkTaxPrice").innerText = `₹${taxCalculation.toFixed(2)}`;
+document.getElementById("chkTotalPrice").innerText = `₹${overallTotal.toFixed(2)}`;
+document.getElementById("chkPayBtnTotal").innerText = `₹${overallTotal.toFixed(2)}`;
+
+navigateTo("checkoutScreen");
+}
+
+// Setup Event Listeners for payment card graphical radio toggles styling classes
+function setupPaymentInteractions() {
+document.querySelectorAll(".pay-option").forEach(box => {
+    box.addEventListener("click", () => {
+        document.querySelectorAll(".pay-option").forEach(b => b.classList.remove("active"));
+        box.classList.add("active");
+        box.querySelector("input").checked = true;
+    });
+});
+}
+
+
+// App context state clean return home reset wrapper
+function resetAppEngineToHome() {
+document.getElementById("busSearchInput").value = "";
+renderBusCards(appState.fleet);
+navigateTo("homeScreen");
+}
+async function executeFinalPaymentTicketGeneration() {
+    const fullNameInput = document.getElementById("passFullName").value.trim();
+    const phoneInput = document.getElementById("passPhone").value.trim();
+
+    if (!fullNameInput || !phoneInput) {
+        alert("Operation Halted: Please fill in all required fields.");
+        return;
+    }
+
+    const bus = appState.selectedBus;
+    const count = appState.selectedSeats.length;
+    const overallTotal = Math.round((count * bus.fare) * 1.05);
+
+    // Build the payload matching your BookingDetail entity fields
+    const bookingPayload = {
+        fullName:    fullNameInput,
+        email:       document.getElementById("passEmail").value.trim(),
+        phoneNumber: phoneInput,
+        route:       bus.route,
+        schedule:    bus.time,
+        nameOfSeat:  appState.selectedSeats.join(", "),
+        numberOfSeat: count,
+        total:       overallTotal
+    };
+
+    try {
+        const response = await fetch("http://localhost:8081/Booking/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookingPayload)
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            alert("Booking failed: " + errText);
+            return;
+        }
+
+        // Only proceed to success screen after DB save succeeds
+        const saved = await response.json();
+        console.log("Booking saved with ID:", saved.id);
+
+    } catch (error) {
+        alert("Network error: Could not reach the booking server. Is your Spring Boot app running?");
+        console.error(error);
+        return;
+    }
+
+    // Populate success screen
+    const uniqueRefCode = "BKM-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+    document.getElementById("successTotalPaid").innerText  = `₹${overallTotal.toFixed(2)}`;
+    document.getElementById("ticketBusName").innerText     = bus.name;
+    document.getElementById("ticketFromCity").innerText    = bus.from;
+    document.getElementById("ticketToCity").innerText      = bus.to;
+    document.getElementById("ticketPassengerName").innerText = fullNameInput;
+    document.getElementById("ticketSeatNumber").innerText  = appState.selectedSeats.join(", ");
+    document.getElementById("ticketReferenceCode").innerText = `#${uniqueRefCode}`;
+    document.getElementById("ticketAmountPaid").innerText  = `₹${overallTotal.toFixed(2)}`;
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("ticketDate").innerText = new Date().toLocaleDateString("en-US", options);
+
+    bus.bookedSeats.push(...appState.selectedSeats);
+    navigateTo("successScreen");
+}
+    async function executeFinalPaymentTicketGeneration() {
+    const fullNameInput = document.getElementById("passFullName").value.trim();
+    const phoneInput    = document.getElementById("passPhone").value.trim();
+
+    if (!fullNameInput || !phoneInput) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    const bus   = appState.selectedBus;
+    const count = appState.selectedSeats.length;
+    const overallTotal = Math.round((count * bus.fare) * 1.05);
+
+    const bookingPayload = {
+        fullName:     fullNameInput,
+        email:        document.getElementById("passEmail").value.trim(),
+        phoneNumber:  phoneInput,
+        route:        bus.route,
+        schedule:     bus.time,
+        nameOfSeat:   appState.selectedSeats.join(", "),
+        numberOfSeat: count,
+        total:        overallTotal
+    };
+
+    try {
+        const res = await fetch("http://localhost:8081/Booking/save", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                // ✅ Send the JWT token stored at login time
+                "Authorization": `Bearer ${appState.activeUser.token}`
+            },
+            body: JSON.stringify(bookingPayload)
+        });
+
+        if (!res.ok) {
+            alert("Booking failed: " + await res.text());
+            return;
+        }
+
+        const saved = await res.json();
+        console.log("Booking saved:", saved.id);
+
+    } catch (err) {
+        alert("Network error: Is your Spring Boot app running?\n" + err.message);
+        return;
+    }
+
+    // populate success screen (unchanged from your original) ...
+    const uniqueRefCode = "BKM-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+    document.getElementById("successTotalPaid").innerText    = `₹${overallTotal.toFixed(2)}`;
+    document.getElementById("ticketBusName").innerText       = bus.name;
+    document.getElementById("ticketFromCity").innerText      = bus.from;
+    document.getElementById("ticketToCity").innerText        = bus.to;
+    document.getElementById("ticketPassengerName").innerText = fullNameInput;
+    document.getElementById("ticketSeatNumber").innerText    = appState.selectedSeats.join(", ");
+    document.getElementById("ticketReferenceCode").innerText = `#${uniqueRefCode}`;
+    document.getElementById("ticketAmountPaid").innerText    = `₹${overallTotal.toFixed(2)}`;
+
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById("ticketDate").innerText = new Date().toLocaleDateString("en-US", options);
+
+    bus.bookedSeats.push(...appState.selectedSeats);
+    navigateTo("successScreen");
+}
+    async function openHistoryScreen() {
+    navigateTo('historyScreen');
+    const listEl  = document.getElementById("historyList");
+    const countEl = document.getElementById("historyCount");
+    listEl.innerHTML = `<p style="text-align:center;padding:2rem;color:var(--text-muted);">Loading your bookings...</p>`;
+
+    try {
+        const res = await fetch(`http://localhost:8081/Booking/history/${appState.activeUser.email}`, {
+            headers: { "Authorization": `Bearer ${appState.activeUser.token}` }
+        });
+
+        if (!res.ok) { listEl.innerHTML = `<p style="color:red;text-align:center;">Failed to load bookings.</p>`; return; }
+
+        const bookings = await res.json();
+        countEl.innerText = `${bookings.length} booking${bookings.length !== 1 ? 's' : ''} found`;
+
+        if (bookings.length === 0) {
+            listEl.innerHTML = `
+                <div class="history-empty">
+                    <div style="font-size:3rem;">🎟️</div>
+                    <p>No bookings yet. Start your first journey!</p>
+                    <button class="btn-primary" style="margin-top:1rem;" onclick="navigateTo('homeScreen')">Browse Buses</button>
+                </div>`;
+            return;
+        }
+
+        listEl.innerHTML = bookings.map(b => `
+            <div class="history-card">
+                <div>
+                    <div class="history-route">🚌 ${b.route}</div>
+                    <div class="history-meta">🕐 ${b.schedule}</div>
+                    <div class="history-meta">👤 ${b.fullName} &nbsp;|&nbsp; 📞 ${b.phoneNumber}</div>
+                    <span class="history-seats">Seats: ${b.nameOfSeat} (${b.numberOfSeat} seat${b.numberOfSeat > 1 ? 's' : ''})</span>
+                </div>
+                <div>
+                    <div class="history-amount">₹${b.total}</div>
+                    <div style="color:var(--text-muted);font-size:0.8rem;text-align:right;margin-top:0.3rem;">Total Paid</div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        listEl.innerHTML = `<p style="color:red;text-align:center;">Network error: ${err.message}</p>`;
+    }
+}
+</script>
+</body>
+</html>
